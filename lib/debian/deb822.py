@@ -192,7 +192,7 @@ class Deb822Dict(object, UserDict.DictMixin):
             # Always return unicode objects instead of strings
             try:
                 value = value.decode(self.encoding)
-            except UnicodeDecodeError, e:
+            except UnicodeDecodeError as e:
                 # Evidently, the value wasn't encoded with the encoding the
                 # user specified.  Try detecting it.
                 warnings.warn('decoding from %s failed; attempting to detect '
@@ -234,8 +234,8 @@ class Deb822Dict(object, UserDict.DictMixin):
         return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
 
     def __eq__(self, other):
-        mykeys = self.keys(); mykeys.sort()
-        otherkeys = other.keys(); otherkeys.sort()
+        mykeys = sorted(self)
+        otherkeys = sorted(other)
         if not mykeys == otherkeys:
             return False
 
@@ -485,8 +485,7 @@ class Deb822(Deb822Dict):
             if (s1 + s2).count(', '):
                 delim = ', '
 
-            L = (s1 + delim + s2).split(delim)
-            L.sort()
+            L = sorted((s1 + delim + s2).split(delim))
 
             prev = merged = L[0]
 
@@ -621,7 +620,7 @@ class Deb822(Deb822Dict):
         # _gpg_multivalued.__init__) which is small compared to Packages or
         # Sources which contain no signature
         if not hasattr(self, 'raw_text'):
-            raise ValueError, "original text cannot be found"
+            raise ValueError("original text cannot be found")
 
         if self.gpg_info is None:
             self.gpg_info = GpgInfo.from_sequence(self.raw_text,
@@ -738,7 +737,7 @@ class GpgInfo(dict):
             args.extend(["--keyring", k])
         
         if "--keyring" not in args:
-            raise IOError, "cannot access any of the given keyrings"
+            raise IOError("cannot access any of the given keyrings")
 
         p = subprocess.Popen(args, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)

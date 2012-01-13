@@ -53,10 +53,10 @@ class ArFile(object):
         elif self.__fileobj:
             fp = self.__fileobj
         else:
-            raise ArError, "Unable to open valid file"
+            raise ArError("Unable to open valid file")
 
         if fp.read(GLOBAL_HEADER_LENGTH) != GLOBAL_HEADER:
-            raise ArError, "Unable to find global header"
+            raise ArError("Unable to find global header")
 
         while True:
             newmember = ArMember.from_file(fp, self.__fname)
@@ -100,12 +100,12 @@ class ArFile(object):
     def extractall():
         """ Not (yet) implemented. """
 
-        raise NotImpelementedError  # TODO
+        raise NotImplementedError  # TODO
 
     def extract(self, member, path):
         """ Not (yet) implemented. """
 
-        raise NotImpelementedError  # TODO
+        raise NotImplementedError  # TODO
 
     def extractfile(self, member):
         """ Return a file object corresponding to the requested member. A member
@@ -171,10 +171,10 @@ class ArMember(object):
 
         # sanity checks
         if len(buf) < FILE_HEADER_LENGTH:
-            raise IOError, "Incorrect header length"
+            raise IOError("Incorrect header length")
 
         if buf[58:60] != FILE_MAGIC:
-            raise IOError, "Incorrect file magic"
+            raise IOError("Incorrect file magic")
 
         # http://en.wikipedia.org/wiki/Ar_(Unix)    
         #from   to     Name                      Format
@@ -263,7 +263,7 @@ class ArMember(object):
             self.__fp.seek(self.__offset)
 
         if whence < 2 and offset + self.__fp.tell() < self.__offset:
-            raise IOError, "Can't seek at %d" % offset
+            raise IOError("Can't seek at %d" % offset)
         
         if whence == 1:
             self.__fp.seek(offset, 1)

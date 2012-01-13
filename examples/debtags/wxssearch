@@ -248,7 +248,6 @@ class Results(wx.ListCtrl):
 
     def model_changed(self, event):
         self.packages = sorted(self.model.subcoll.iter_packages())
-        self.packages.sort()
         self.SetItemCount(len(self.packages))
         self.resize_columns()
         event.Skip()

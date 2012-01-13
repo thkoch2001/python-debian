@@ -19,7 +19,7 @@ try:
 except IndexError:
     print >>sys.stderr, "Usage: grep-maintainer REGEXP"
     sys.exit(1)
-except re.error, e:
+except re.error as e:
     print >>sys.stderr, "Error in the regexp: %s" % (e,)
     sys.exit(1)
 

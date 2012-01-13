@@ -29,15 +29,6 @@ sys.path.insert(0, '../lib/debian/')
 
 import deb822
 
-# Keep the test suite compatible with python2.3 for now
-try:
-    sorted
-except NameError:
-    def sorted(iterable, cmp=None):
-        tmp = iterable[:]
-        tmp.sort(cmp)
-        return tmp
-
 
 UNPARSED_PACKAGE = '''\
 Package: mutt

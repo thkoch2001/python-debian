@@ -53,9 +53,9 @@ class ParseError(Exception):
         return self.msg
 
     def __repr__(self):
-        return "ParseError(%s, %d, %s)" % (`self.filename`,
+        return "ParseError(%r, %d, %r)" % (self.filename,
                                            self.lineno,
-                                           `self.msg`)
+                                           self.msg)
 
     def print_out(self, file):
         """Writes a machine-parsable error message to file."""
@@ -192,7 +192,7 @@ class NativeVersion(BaseVersion):
         if not isinstance(other, BaseVersion):
             try:
                 other = BaseVersion(str(other))
-            except ValueError, e:
+            except ValueError as e:
                 raise ValueError("Couldn't convert %r to BaseVersion: %s"
                                  % (other, e))
 
@@ -337,7 +337,7 @@ class PseudoEnum:
         self._name = name
         self._order = order
     def __repr__(self):
-        return '%s(%s)'% (self.__class__._name__, `name`)
+        return '%s(%r)' % (self.__class__._name__, self._name)
     def __str__(self):
         return self._name
     def __cmp__(self, other):
@@ -392,7 +392,7 @@ def patches_from_ed_script(source,
     for line in i:
         match = re_cmd.match(line)
         if match is None:
-            raise ValueError, "invalid patch command: " + `line`
+            raise ValueError("invalid patch command: %r" % line)
 
         (first, last, cmd) = match.groups()
         first = int(first)
@@ -408,7 +408,7 @@ def patches_from_ed_script(source,
 
         if cmd == 'a':
             if last is not None:
-                raise ValueError, "invalid patch argument: " + `line`
+                raise ValueError("invalid patch argument: %r" % line)
             last = first
         else:                           # cmd == c
             first = first - 1
@@ -418,7 +418,7 @@ def patches_from_ed_script(source,
         lines = []
         for l in i:
             if l == '':
-                raise ValueError, "end of stream in command: " + `line`
+                raise ValueError("end of stream in command: %r" % line)
             if l == '.\n' or l == '.':
                 break
             lines.append(l)
@@ -561,7 +561,7 @@ def update_file(remote, local, verbose=None):
                 continue
             
             if verbose:
-                print "update_file: field %s ignored" % `field`
+                print "update_file: field %r ignored" % field
         
     if not patches_to_apply:
         if verbose:
@@ -569,17 +569,17 @@ def update_file(remote, local, verbose=None):
         return download_file(remote, local)
 
     for patch_name in patches_to_apply:
-        print "update_file: downloading patch " + `patch_name`
+        print "update_file: downloading patch %r" % patch_name
         patch_contents = download_gunzip_lines(remote + '.diff/' + patch_name
                                           + '.gz')
-        if read_lines_sha1(patch_contents ) <> patch_hashes[patch_name]:
-            raise ValueError, "patch %s was garbled" % `patch_name`
+        if read_lines_sha1(patch_contents ) != patch_hashes[patch_name]:
+            raise ValueError("patch %r was garbled" % patch_name)
         patch_lines(lines, patches_from_ed_script(patch_contents))
         
     new_hash = read_lines_sha1(lines)
-    if new_hash <> remote_hash:
-        raise ValueError, ("patch failed, got %s instead of %s"
-                           % (new_hash, remote_hash))
+    if new_hash != remote_hash:
+        raise ValueError("patch failed, got %s instead of %s"
+                         % (new_hash, remote_hash))
 
     replace_file(lines, local)
     return lines
@@ -593,8 +593,6 @@ def merge_as_sets(*args):
     for x in args:
         for y in x:
             s[y] = True
-    l = s.keys()
-    l.sort()
-    return l
+    return sorted(s)
 
 mergeAsSets = function_deprecated_by(merge_as_sets)
