@@ -97,7 +97,7 @@ class ArFile(object):
     def getnames(self):
         """ Return a list of all member names in the archive. """
 
-        return map(lambda f: f.name, self.__members)
+        return [f.name for f in self.__members]
 
     def extractall():
         """ Not (yet) implemented. """
