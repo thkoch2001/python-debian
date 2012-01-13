@@ -73,7 +73,7 @@ if __name__ == '__main__':
 		# Divide every tag score by the number of packages in the trail,
 		# obtaining a 'tag weight'.  A package can be later scored by summing
 		# the weight of all its tags.
-		for tag in tagscores.iterkeys():
+		for tag in tagscores:
 			tagscores[tag] = float(tagscores[tag]) / float(len(trail))
 
 		# Find the merged tagset of the packages in trail

@@ -169,7 +169,7 @@ class Deb822Dict(object, UserDict.DictMixin):
         if _parsed is not None:
             self.__parsed = _parsed
             if _fields is None:
-                self.__keys.extend([ _strI(k) for k in self.__parsed.keys() ])
+                self.__keys.extend([ _strI(k) for k in self.__parsed ])
             else:
                 self.__keys.extend([ _strI(f) for f in _fields if f in self.__parsed ])
         
@@ -440,7 +440,7 @@ class Deb822(Deb822Dict):
             # was explicitly specified
             encoding = self.encoding
 
-        for key in self.iterkeys():
+        for key in self:
             value = self.get_as_string(key)
             if not value or value[0] == '\n':
                 # Avoid trailing whitespace after "Field:" if it's on its own

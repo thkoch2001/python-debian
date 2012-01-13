@@ -566,7 +566,7 @@ class TestDeb822(unittest.TestCase):
 
         deb822_ = deb822.Deb822(StringIO(UNPARSED_PACKAGE))
         # deb822_.keys() will return non-normalized keys
-        for k in deb822_.keys():
+        for k in deb822_:
             self.assertEqual(deb822_[k], deb822_[k.lower()])
 
     def test_multiline_trailing_whitespace_after_colon(self):
