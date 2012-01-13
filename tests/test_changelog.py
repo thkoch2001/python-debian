@@ -24,12 +24,14 @@
 # Copyright 2005 Frank Lichtenheld <frank@lichtenheld.de>
 # and licensed under the same license as above.
 
+from __future__ import absolute_import
+
 import sys
 import unittest
 
-sys.path.insert(0, '../lib/debian/')
+sys.path.insert(0, '../lib/')
 
-import changelog
+from debian import changelog
 
 class ChangelogTests(unittest.TestCase):
 

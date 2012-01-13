@@ -18,13 +18,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+from __future__ import absolute_import
+
 import sys
 import unittest
 
-sys.path.insert(0, '../lib/debian/')
+sys.path.insert(0, '../lib/')
 
-import debian_support
-from debian_support import *
+from debian import debian_support
+from debian.debian_support import *
 
 
 class VersionTests(unittest.TestCase):

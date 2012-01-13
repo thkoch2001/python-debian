@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import re, cPickle
 
-from deprecation import function_deprecated_by
+from debian.deprecation import function_deprecated_by
 
 def parse_tags(input):
 	lre = re.compile(r"^(.+?)(?::?\s*|:\s+(.+?)\s*)$")

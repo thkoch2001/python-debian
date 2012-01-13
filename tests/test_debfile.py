@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import absolute_import
+
 import unittest
 import os
 import re
@@ -25,10 +27,10 @@ import sys
 import tempfile
 import uu
 
-sys.path.insert(0, '../lib/debian/')
+sys.path.insert(0, '../lib/')
 
-import arfile
-import debfile
+from debian import arfile
+from debian import debfile
 
 class TestArFile(unittest.TestCase):
 

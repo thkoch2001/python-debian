@@ -17,6 +17,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+from __future__ import absolute_import
+
 import os
 import re
 import sys
@@ -25,9 +27,9 @@ import unittest
 import warnings
 from StringIO import StringIO
 
-sys.path.insert(0, '../lib/debian/')
+sys.path.insert(0, '../lib/')
 
-import deb822
+from debian import deb822
 
 
 UNPARSED_PACKAGE = '''\

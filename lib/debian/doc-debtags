@@ -1,10 +1,14 @@
 #!/usr/bin/python
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
-import debtags
 import sys
+import os
 import inspect
+
+sys.path.insert(0, os.path.join(sys.path[0], os.pardir))
+
+from debian import debtags
 
 def print_indented (spaces, string):
 	for line in string.split("\n"):

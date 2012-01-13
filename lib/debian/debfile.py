@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import gzip
 import tarfile
 
-from arfile import ArFile, ArError
-from changelog import Changelog
-from deb822 import Deb822
+from debian.arfile import ArFile, ArError
+from debian.changelog import Changelog
+from debian.deb822 import Deb822
 
 DATA_PART = 'data.tar'      # w/o extension
 CTRL_PART = 'control.tar'

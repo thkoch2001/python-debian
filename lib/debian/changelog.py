@@ -23,13 +23,15 @@
 
 """This module implements facilities to deal with Debian changelogs."""
 
+from __future__ import absolute_import
+
 import os
 import pwd
 import re
 import socket
 import warnings
 
-import debian_support
+from debian import debian_support
 
 class ChangelogParseError(StandardError):
     """Indicates that the changelog could not be parsed"""

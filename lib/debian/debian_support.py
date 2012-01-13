@@ -18,14 +18,14 @@
 
 """This module implements facilities to deal with Debian-specific metadata."""
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import os
 import re
 import hashlib
 import types
 
-from deprecation import function_deprecated_by
+from debian.deprecation import function_deprecated_by
 
 try:
     import apt_pkg
