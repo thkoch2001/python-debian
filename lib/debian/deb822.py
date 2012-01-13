@@ -22,6 +22,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+from __future__ import print_function
+
 from deprecation import function_deprecated_by
 
 try:
@@ -824,9 +826,9 @@ class PkgRelation(object):
                     d['arch'] = parse_archs(parts['archs'])
                 return d
             else:
-                print >> sys.stderr, \
-                        'deb822.py: WARNING: cannot parse package' \
-                        ' relationship "%s", returning it raw' % raw
+                print('deb822.py: WARNING: cannot parse package' \
+                      ' relationship "%s", returning it raw' % raw,
+                      file=sys.stderr)
                 return { 'name': raw, 'version': None, 'arch': None }
 
         tl_deps = cls.__comma_sep_RE.split(raw.strip()) # top-level deps

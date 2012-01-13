@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import re, cPickle
 
 from deprecation import function_deprecated_by
@@ -96,7 +98,7 @@ def output(db):
 	for pkg, tags in db.items():
 		# Using % here seems awkward to me, but if I use calls to
 		# sys.stdout.write it becomes a bit slower
-		print "%s:" % (pkg), ", ".join(tags)
+		print("%s:" % (pkg), ", ".join(tags))
 
 
 def relevance_index_function(full, sub):

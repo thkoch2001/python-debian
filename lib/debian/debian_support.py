@@ -18,6 +18,8 @@
 
 """This module implements facilities to deal with Debian-specific metadata."""
 
+from __future__ import print_function
+
 import os
 import re
 import hashlib
@@ -499,7 +501,7 @@ def update_file(remote, local, verbose=None):
         local_file = file(local)
     except IOError:
         if verbose:
-            print "update_file: no local copy, downloading full file"
+            print("update_file: no local copy, downloading full file")
         return download_file(remote, local)
 
     lines = local_file.readlines()
@@ -520,11 +522,11 @@ def update_file(remote, local, verbose=None):
         # FIXME: urllib does not raise a proper exception, so we parse
         # the error message.
         if verbose:
-            print "update_file: could not interpret patch index file"
+            print("update_file: could not interpret patch index file")
         return download_file(remote, local)
     except IOError:
         if verbose:
-            print "update_file: could not download patch index file"
+            print("update_file: could not download patch index file")
         return download_file(remote, local)
 
     for fields in index_fields:
@@ -533,7 +535,7 @@ def update_file(remote, local, verbose=None):
                 (remote_hash, remote_size) = re_whitespace.split(value)
                 if local_hash == remote_hash:
                     if verbose:
-                        print "update_file: local file is up-to-date"
+                        print("update_file: local file is up-to-date")
                     return lines
                 continue
 
@@ -561,15 +563,15 @@ def update_file(remote, local, verbose=None):
                 continue
             
             if verbose:
-                print "update_file: field %r ignored" % field
+                print("update_file: field %r ignored" % field)
         
     if not patches_to_apply:
         if verbose:
-            print "update_file: could not find historic entry", local_hash
+            print("update_file: could not find historic entry", local_hash)
         return download_file(remote, local)
 
     for patch_name in patches_to_apply:
-        print "update_file: downloading patch %r" % patch_name
+        print("update_file: downloading patch %r" % patch_name)
         patch_contents = download_gunzip_lines(remote + '.diff/' + patch_name
                                           + '.gz')
         if read_lines_sha1(patch_contents ) != patch_hashes[patch_name]:

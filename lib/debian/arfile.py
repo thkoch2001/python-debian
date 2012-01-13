@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 GLOBAL_HEADER = "!<arch>\n"
 GLOBAL_HEADER_LENGTH = len(GLOBAL_HEADER)
 
@@ -311,4 +313,4 @@ if __name__ == '__main__':
     # test
     # ar r test.ar <file1> <file2> .. <fileN>
     a = ArFile("test.ar")
-    print "\n".join(a.getnames())
+    print("\n".join(a.getnames()))
