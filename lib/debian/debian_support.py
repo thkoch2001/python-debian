@@ -358,10 +358,7 @@ def list_releases():
 listReleases = function_deprecated_by(list_releases)
 
 def intern_release(name, releases=list_releases()):
-    if releases.has_key(name):
-        return releases[name]
-    else:
-        return None
+    return releases.get(name)
 
 internRelease = function_deprecated_by(intern_release)
 

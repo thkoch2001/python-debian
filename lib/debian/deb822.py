@@ -169,7 +169,7 @@ class Deb822Dict(object, UserDict.DictMixin):
             if _fields is None:
                 self.__keys.extend([ _strI(k) for k in self.__parsed.keys() ])
             else:
-                self.__keys.extend([ _strI(f) for f in _fields if self.__parsed.has_key(f) ])
+                self.__keys.extend([ _strI(f) for f in _fields if f in self.__parsed ])
         
     ### BEGIN DictMixin methods
 
@@ -221,7 +221,7 @@ class Deb822Dict(object, UserDict.DictMixin):
             # only been in the self.__parsed dict.
             pass
 
-    def has_key(self, key):
+    def __contains__(self, key):
         key = _strI(key)
         return key in self.__keys
     
@@ -245,6 +245,10 @@ class Deb822Dict(object, UserDict.DictMixin):
 
         # If we got here, everything matched
         return True
+
+    # Overriding __eq__ blocks inheritance of __hash__ in Python 3, and
+    # instances of this class are not sensibly hashable anyway.
+    __hash__ = None
 
     def copy(self):
         # Use self.__class__ so this works as expected for subclasses
@@ -665,7 +669,7 @@ class GpgInfo(dict):
 
     def valid(self):
         """Is the signature valid?"""
-        return self.has_key('GOODSIG') or self.has_key('VALIDSIG')
+        return 'GOODSIG' in self or 'VALIDSIG' in self
     
 # XXX implement as a property?
 # XXX handle utf-8 %-encoding
@@ -846,9 +850,9 @@ class PkgRelation(object):
 
         def pp_atomic_dep(dep):
             s = dep['name']
-            if dep.has_key('version') and dep['version'] is not None:
+            if dep.get('version') is not None:
                 s += ' (%s %s)' % dep['version']
-            if dep.has_key('arch') and dep['arch'] is not None:
+            if dep.get('arch') is not None:
                 s += ' [%s]' % string.join(map(pp_arch, dep['arch']))
             return s
 
@@ -894,7 +898,7 @@ class _PkgRelationMixin(object):
             # name) of Deb822 objects on the dictionary returned by the
             # relations property.
             keyname = name.lower()
-            if self.has_key(name):
+            if name in self:
                 self.__relations[keyname] = None   # lazy value
                     # all lazy values will be expanded before setting
                     # __parsed_relations to True

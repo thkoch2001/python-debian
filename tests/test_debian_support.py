@@ -141,7 +141,7 @@ class VersionTests(unittest.TestCase):
             v1 = cls1(v1_str)
             v2 = cls2(v2_str)
             truth_fn = self._get_truth_fn(cmp_oper)
-            self.failUnless(truth_fn(v1, v2) == True,
+            self.assertTrue(truth_fn(v1, v2) == True,
                             "%r %s %r != True" % (v1, cmp_oper, v2))
 
     def test_comparisons(self):

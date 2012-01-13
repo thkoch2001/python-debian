@@ -51,7 +51,7 @@ def read_tag_database_reversed(input):
 	for pkgs, tags in parse_tags(input):
 		# Create the tag set using the native set
 		for tag in tags:
-			if db.has_key(tag):
+			if tag in db:
 				db[tag] |= pkgs
 			else:
 				db[tag] = pkgs.copy()
@@ -72,7 +72,7 @@ def read_tag_database_both_ways(input, tag_filter = None):
 		for pkg in pkgs:
 			db[pkg] = tags.copy()
 		for tag in tags:
-			if dbr.has_key(tag):
+			if tag in dbr:
 				dbr[tag] |= pkgs
 			else:
 				dbr[tag] = pkgs.copy()
@@ -85,7 +85,7 @@ def reverse(db):
 	res = {}
 	for pkg, tags in db.items():
 		for tag in tags:
-			if not res.has_key(tag):
+			if tag not in res:
 				res[tag] = set()
 			res[tag].add(pkg)
 	return res
@@ -165,7 +165,7 @@ class DB:
 	def insert(self, pkg, tags):
 		self.db[pkg] = tags.copy()
 		for tag in tags:
-			if self.rdb.has_key(tag):
+			if tag in self.rdb:
 				self.rdb[tag].add(pkg)
 			else:
 				self.rdb[tag] = set((pkg))
@@ -229,7 +229,7 @@ class DB:
 		res = DB()
 		db = {}
 		for pkg in package_iter:
-			if self.db.has_key(pkg): db[pkg] = self.db[pkg]
+			if pkg in self.db: db[pkg] = self.db[pkg]
 		res.db = db
 		res.rdb = reverse(db)
 		return res
@@ -349,25 +349,25 @@ class DB:
 
 	def has_package(self, pkg):
 		"""Check if the collection contains the given package"""
-		return self.db.has_key(pkg)
+		return pkg in self.db
 
 	hasPackage = function_deprecated_by(has_package)
 
 	def has_tag(self, tag):
 		"""Check if the collection contains packages tagged with tag"""
-		return self.rdb.has_key(tag)
+		return tag in self.rdb
 
 	hasTag = function_deprecated_by(has_tag)
 
 	def tags_of_package(self, pkg):
 		"""Return the tag set of a package"""
-		return self.db.has_key(pkg) and self.db[pkg] or set()
+		return pkg in self.db and self.db[pkg] or set()
 
 	tagsOfPackage = function_deprecated_by(tags_of_package)
 
 	def packages_of_tag(self, tag):
 		"""Return the package set of a tag"""
-		return self.rdb.has_key(tag) and self.rdb[tag] or set()
+		return tag in self.rdb and self.rdb[tag] or set()
 
 	packagesOfTag = function_deprecated_by(packages_of_tag)
 
@@ -399,7 +399,7 @@ class DB:
 		"""
 		Return the cardinality of a tag
 		"""
-		return self.rdb.has_key(tag) and len(self.rdb[tag]) or 0
+		return tag in self.rdb and len(self.rdb[tag]) or 0
 
 	def discriminance(self, tag):
 		"""
