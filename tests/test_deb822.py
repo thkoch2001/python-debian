@@ -338,7 +338,7 @@ class TestDeb822(unittest.TestCase):
 
         for k, v in dict_.items():
             self.assertEqual(v, deb822_[k])
-        self.assertEqual(0, deb822_.__cmp__(dict_))
+        self.assertEqual(deb822_, dict_)
 
     def gen_random_string(length=20):
         from random import choice

@@ -158,8 +158,29 @@ class BaseVersion(object):
     def __repr__(self):
         return "%s('%s')" % (self.__class__.__name__, self)
 
-    def __cmp__(self, other):
+    def _compare(self, other):
         raise NotImplementedError
+
+    # TODO: Once we support only Python >= 2.7, we can simplify this using
+    # @functools.total_ordering.
+
+    def __lt__(self, other):
+        return self._compare(other) < 0
+
+    def __le__(self, other):
+        return self._compare(other) <= 0
+
+    def __eq__(self, other):
+        return self._compare(other) == 0
+
+    def __ne__(self, other):
+        return self._compare(other) != 0
+
+    def __ge__(self, other):
+        return self._compare(other) >= 0
+
+    def __gt__(self, other):
+        return self._compare(other) > 0
 
     def __hash__(self):
         return hash(str(self))
@@ -173,7 +194,7 @@ class AptPkgVersion(BaseVersion):
                                       "python-apt package")
         super(AptPkgVersion, self).__init__(version)
 
-    def __cmp__(self, other):
+    def _compare(self, other):
         return apt_pkg.version_compare(str(self), str(other))
 
 # NativeVersion based on the DpkgVersion class by Raphael Hertzog in
@@ -186,7 +207,7 @@ class NativeVersion(BaseVersion):
     re_digit = re.compile("\d")
     re_alpha = re.compile("[A-Za-z]")
 
-    def __cmp__(self, other):
+    def _compare(self, other):
         # Convert other into an instance of BaseVersion if it's not already.
         # (All we need is epoch, upstream_version, and debian_revision
         # attributes, which BaseVersion gives us.) Requires other's string
@@ -198,9 +219,12 @@ class NativeVersion(BaseVersion):
                 raise ValueError("Couldn't convert %r to BaseVersion: %s"
                                  % (other, e))
 
-        res = cmp(int(self.epoch or "0"), int(other.epoch or "0"))
-        if res != 0:
-            return res
+        lepoch = int(self.epoch or "0")
+        repoch = int(other.epoch or "0")
+        if lepoch < repoch:
+            return -1
+        elif lepoch > repoch:
+            return 1
         res = self._version_cmp_part(self.upstream_version,
                                      other.upstream_version)
         if res != 0:
@@ -231,9 +255,10 @@ class NativeVersion(BaseVersion):
                 a = la.pop(0)
             if lb:
                 b = lb.pop(0)
-            res = cmp(a, b)
-            if res != 0:
-                return res
+            if a < b:
+                return -1
+            elif a > b:
+                return 1
         return 0
 
     @classmethod
@@ -250,9 +275,10 @@ class NativeVersion(BaseVersion):
             if cls.re_digits.match(a) and cls.re_digits.match(b):
                 a = int(a)
                 b = int(b)
-                res = cmp(a, b)
-                if res != 0:
-                    return res
+                if a < b:
+                    return -1
+                elif a > b:
+                    return 1
             else:
                 res = cls._version_cmp_string(a, b)
                 if res != 0:
@@ -267,7 +293,14 @@ else:
         pass
 
 def version_compare(a, b):
-    return cmp(Version(a), Version(b))
+    va = Version(a)
+    vb = Version(b)
+    if va < vb:
+        return -1
+    elif va > vb:
+        return 1
+    else:
+        return 0
 
 class PackageFile:
     """A Debian package file.
@@ -342,8 +375,20 @@ class PseudoEnum:
         return '%s(%r)' % (self.__class__._name__, self._name)
     def __str__(self):
         return self._name
-    def __cmp__(self, other):
-        return cmp(self._order, other._order)
+    # TODO: Once we support only Python >= 2.7, we can simplify this using
+    # @functools.total_ordering.
+    def __lt__(self, other):
+        return self._order < other._order
+    def __le__(self, other):
+        return self._order <= other._order
+    def __eq__(self, other):
+        return self._order == other._order
+    def __ne__(self, other):
+        return self._order != other._order
+    def __ge__(self, other):
+        return self._order >= other._order
+    def __gt__(self, other):
+        return self._order > other._order
     def __hash__(self):
         return hash(self._order)
 
