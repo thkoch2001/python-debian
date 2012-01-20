@@ -286,7 +286,7 @@ class PackageFile:
                   file with the indicated name.
         """
         if file_obj is None:
-            file_obj = file(name)
+            file_obj = open(name)
         self.name = name
         self.file = file_obj
         self.lineno = 0
@@ -440,7 +440,7 @@ def replace_file(lines, local):
     import os.path
 
     local_new = local + '.new'
-    new_file = file(local_new, 'w+')
+    new_file = open(local_new, 'w+')
 
     try:
         for l in lines:
@@ -498,7 +498,7 @@ def update_file(remote, local, verbose=None):
     """
 
     try:
-        local_file = file(local)
+        local_file = open(local)
     except IOError:
         if verbose:
             print("update_file: no local copy, downloading full file")

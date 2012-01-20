@@ -25,7 +25,7 @@ except re.error as e:
     print("Error in the regexp: %s" % (e,), file=sys.stderr)
     sys.exit(1)
 
-for pkg in deb822.Packages.iter_paragraphs(file('/var/lib/dpkg/status')):
+for pkg in deb822.Packages.iter_paragraphs(open('/var/lib/dpkg/status')):
     if 'Maintainer' in pkg and maint_RE.search(pkg['maintainer']):
         print(pkg['package'])
 

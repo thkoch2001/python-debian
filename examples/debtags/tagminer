@@ -96,7 +96,7 @@ def mimetype(fname):
         else:
             xkeys[k] = [v]
     namemagic =  magic.file(fname)
-    contentmagic = magic.buffer(file(fname, "r").read(4096))
+    contentmagic = magic.buffer(open(fname, "r").read(4096))
     return "mimetype" in xkeys and xkeys['mimetype'][0] or contentmagic or namemagic
 
 

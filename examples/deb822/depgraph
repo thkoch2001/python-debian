@@ -39,7 +39,7 @@ def main():
         print('  "%s" [label="%s"] ;' % (node, dsc))
 
     print("digraph depgraph {")
-    for pkg in deb822.Packages.iter_paragraphs(file(sys.argv[1])):
+    for pkg in deb822.Packages.iter_paragraphs(open(sys.argv[1])):
         name = pkg['package']
         rels = pkg.relations
         for deps in rels['depends']:

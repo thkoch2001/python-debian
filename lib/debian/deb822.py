@@ -267,7 +267,7 @@ class Deb822(Deb822Dict):
         """Create a new Deb822 instance.
 
         :param sequence: a string, or any any object that returns a line of
-            input each time, normally a file().  Alternately, sequence can
+            input each time, normally a file.  Alternately, sequence can
             be a dict that contains the initial key-value pairs.
 
         :param fields: if given, it is interpreted as a list of fields that
@@ -304,7 +304,7 @@ class Deb822(Deb822Dict):
 
         :param fields: likewise.
 
-        :param use_apt_pkg: if sequence is a file(), apt_pkg will be used 
+        :param use_apt_pkg: if sequence is a file, apt_pkg will be used
             if available to parse the file, since it's much much faster.  Set
             this parameter to False to disable using apt_pkg.
         :param shared_storage: not used, here for historical reasons.  Deb822
@@ -776,7 +776,8 @@ class GpgInfo(dict):
 
         See GpgInfo.from_sequence.
         """
-        return cls.from_sequence(file(target), *args, **kwargs)
+        with open(target) as target_file:
+            return cls.from_sequence(target_file, *args, **kwargs)
 
 
 class PkgRelation(object):
