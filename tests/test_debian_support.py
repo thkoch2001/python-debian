@@ -176,7 +176,7 @@ class ReleaseTests(unittest.TestCase):
     """Tests for debian_support.Release"""
 
     def test_comparison(self):
-        self.assert_(intern_release('sarge') < intern_release('etch'))
+        self.assertTrue(intern_release('sarge') < intern_release('etch'))
 
 
 class HelperRoutineTests(unittest.TestCase):

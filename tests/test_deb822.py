@@ -491,10 +491,10 @@ class TestDeb822(unittest.TestCase):
         wanted_fields = [ 'Package', 'MD5sum', 'Filename', 'Description' ]
         deb822_ = deb822.Deb822(UNPARSED_PACKAGE.splitlines(), wanted_fields)
 
-        self.assertEquals(sorted(wanted_fields), sorted(deb822_.keys()))
+        self.assertEqual(sorted(wanted_fields), sorted(deb822_.keys()))
 
         for key in wanted_fields:
-            self.assertEquals(PARSED_PACKAGE[key], deb822_[key])
+            self.assertEqual(PARSED_PACKAGE[key], deb822_[key])
 
     def test_iter_paragraphs_limit_fields(self):
         wanted_fields = [ 'Package', 'MD5sum', 'Filename', 'Tag' ]
@@ -502,10 +502,10 @@ class TestDeb822(unittest.TestCase):
         for deb822_ in deb822.Deb822.iter_paragraphs(
                 UNPARSED_PACKAGE.splitlines(), wanted_fields):
 
-            self.assertEquals(sorted(wanted_fields), sorted(deb822_.keys()))
+            self.assertEqual(sorted(wanted_fields), sorted(deb822_.keys()))
 
             for key in wanted_fields:
-                self.assertEquals(PARSED_PACKAGE[key], deb822_[key])
+                self.assertEqual(PARSED_PACKAGE[key], deb822_[key])
 
     def test_dont_assume_trailing_newline(self):
         deb822a = deb822.Deb822(['Package: foo'])
@@ -548,7 +548,7 @@ class TestDeb822(unittest.TestCase):
         dict_['Multiline-Field'] = 'a\n b\n c' # XXX should be 'a\nb\nc'?
 
         for k, v in deb822_.items():
-            self.assertEquals(dict_[k], v)
+            self.assertEqual(dict_[k], v)
     
     def test_case_insensitive(self):
         # PARSED_PACKAGE is a deb822.Deb822Dict object, so we can test
@@ -587,9 +587,10 @@ class TestDeb822(unittest.TestCase):
         for cls in deb822.Deb822, deb822.Changes:
             parsed = cls(CHANGES_FILE.splitlines())
             for line in parsed.dump().splitlines():
-                self.assert_(bad_re.match(line) is None,
-                            "There should not be trailing whitespace after the "
-                            "colon in a multiline field starting with a newline")
+                self.assertTrue(bad_re.match(line) is None,
+                                "There should not be trailing whitespace "
+                                "after the colon in a multiline field "
+                                "starting with a newline")
 
         
         control_paragraph = """Package: python-debian
@@ -614,10 +615,10 @@ Description: python modules to work with Debian-related data formats
         field_with_space_re = re.compile(r"^\S+: ")
         for line in parsed_control.dump().splitlines():
             if field_re.match(line):
-                self.assert_(field_with_space_re.match(line),
-                             "Multiline fields that do not start with newline "
-                             "should have a space between the colon and the "
-                             "beginning of the value")
+                self.assertTrue(field_with_space_re.match(line),
+                                "Multiline fields that do not start with "
+                                "newline should have a space between the "
+                                "colon and the beginning of the value")
 
     def test_blank_value(self):
         """Fields with blank values are parsable--so they should be dumpable"""
@@ -643,7 +644,7 @@ Description: python modules to work with Debian-related data formats
         d['Bar'] = 'baz'
         d_copy = d.copy()
 
-        self.assert_(isinstance(d_copy, deb822.Deb822))
+        self.assertTrue(isinstance(d_copy, deb822.Deb822))
         expected_dump = "Foo: bar\nBar: baz\n"
         self.assertEqual(d_copy.dump(), expected_dump)
 
@@ -695,7 +696,7 @@ Description: python modules to work with Debian-related data formats
                          open('test_Sources.iso8859-1'), encoding="iso8859-1"))
         for d in objects:
             for value in d.values():
-                self.assert_(isinstance(value, unicode))
+                self.assertTrue(isinstance(value, unicode))
 
         # The same should be true for Sources and Changes except for their
         # _multivalued fields
@@ -707,7 +708,7 @@ Description: python modules to work with Debian-related data formats
         for d in multi:
             for key, value in d.items():
                 if key.lower() not in d.__class__._multivalued_fields:
-                    self.assert_(isinstance(value, unicode))
+                    self.assertTrue(isinstance(value, unicode))
 
     def test_encoding_integrity(self):
         utf8 = list(deb822.Deb822.iter_paragraphs(open('test_Sources')))

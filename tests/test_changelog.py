@@ -203,7 +203,7 @@ haskell-src-exts (1.8.2-2) unstable; urgency=low
  -- Marco Túlio Gontijo e Silva <marcot@debian.org>  Tue, 16 Mar 2010 10:59:48 -0300
 """
         self.assertEqual(u, expected_u)
-        self.assertEquals(str(c), u.encode('utf-8'))
+        self.assertEqual(str(c), u.encode('utf-8'))
 
     def test_unicode_object_input(self):
         f = open('test_changelog_unicode')
