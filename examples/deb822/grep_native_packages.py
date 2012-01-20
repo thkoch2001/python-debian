@@ -8,6 +8,8 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
+from __future__ import print_function
+
 import sys
 
 from debian import deb822
@@ -17,6 +19,6 @@ for fname in sys.argv[1:]:
     for stanza in deb822.Sources.iter_paragraphs(f):
         pieces = stanza['version'].split('-')
         if len(pieces) < 2:
-            print stanza['package']
+            print(stanza['package'])
     f.close()
 
