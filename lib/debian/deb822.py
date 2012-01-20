@@ -37,7 +37,6 @@ except (ImportError, AttributeError):
 import chardet
 import os
 import re
-import string
 import subprocess
 import sys
 import warnings
@@ -855,11 +854,11 @@ class PkgRelation(object):
             if dep.get('version') is not None:
                 s += ' (%s %s)' % dep['version']
             if dep.get('arch') is not None:
-                s += ' [%s]' % string.join(map(pp_arch, dep['arch']))
+                s += ' [%s]' % ' '.join(map(pp_arch, dep['arch']))
             return s
 
-        pp_or_dep = lambda deps: string.join(map(pp_atomic_dep, deps), ' | ')
-        return string.join(map(pp_or_dep, rels), ', ')
+        pp_or_dep = lambda deps: ' | '.join(map(pp_atomic_dep, deps))
+        return ', '.join(map(pp_or_dep, rels))
 
 
 class _lowercase_dict(dict):

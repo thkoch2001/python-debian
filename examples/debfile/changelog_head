@@ -13,7 +13,6 @@ shipped in a .deb file."""
 
 from __future__ import print_function
 
-import string
 import sys
 
 from debian import debfile
@@ -33,5 +32,5 @@ if __name__ == '__main__':
     deb = debfile.DebFile(sys.argv[1])
     chg = deb.changelog()
     entries = chg._blocks[:entries]
-    print(string.join(map(str, entries)))
+    print(''.join(map(str, entries)))
 

@@ -16,7 +16,6 @@ from __future__ import print_function
 
 import os
 import stat
-import string
 import sys
 
 from debian import debfile
@@ -49,7 +48,7 @@ if __name__ == '__main__':
         if n.lower() == 'description':  # increase indentation of long dsc
             lines = v.split('\n')
             short_dsc = lines[0]
-            long_dsc = string.join(map(lambda l: ' ' + l, lines[1:]), '\n')
+            long_dsc = '\n'.join(map(lambda l: ' ' + l, lines[1:]))
             print(' %s: %s\n%s' % (n, short_dsc, long_dsc))
         else:
             print(' %s: %s' % (n, v))
