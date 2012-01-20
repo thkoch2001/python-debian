@@ -673,7 +673,7 @@ Description: python modules to work with Debian-related data formats
         self.assertEqual(input2, d2.dump())
 
         d3 = deb822.Deb822()
-        if not d3.has_key('some-test-key'):
+        if 'some-test-key' not in d3:
             d3['Some-Test-Key'] = 'some value'
         self.assertEqual(d3.dump(), "Some-Test-Key: some value\n")
 

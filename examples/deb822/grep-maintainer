@@ -26,6 +26,6 @@ except re.error as e:
     sys.exit(1)
 
 for pkg in deb822.Packages.iter_paragraphs(file('/var/lib/dpkg/status')):
-    if pkg.has_key('Maintainer') and maint_RE.search(pkg['maintainer']):
+    if 'Maintainer' in pkg and maint_RE.search(pkg['maintainer']):
         print(pkg['package'])
 

@@ -91,13 +91,13 @@ def mimetype(fname):
     keys = extractor.extract(fname)
     xkeys = {}
     for k, v in keys:
-        if xkeys.has_key(k):
+        if k in xkeys:
             xkeys[k].append(v)
         else:
             xkeys[k] = [v]
     namemagic =  magic.file(fname)
     contentmagic = magic.buffer(file(fname, "r").read(4096))
-    return xkeys.has_key("mimetype") and xkeys['mimetype'][0] or contentmagic or namemagic
+    return "mimetype" in xkeys and xkeys['mimetype'][0] or contentmagic or namemagic
 
 
 class Parser(OptionParser):
