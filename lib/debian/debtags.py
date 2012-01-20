@@ -17,7 +17,11 @@
 
 from __future__ import absolute_import, print_function
 
-import re, cPickle
+import re
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 from debian.deprecation import function_deprecated_by
 
@@ -156,13 +160,13 @@ class DB:
 
 	def qwrite(self, file):
 		"Quickly write the data to a pickled file"
-		cPickle.dump(self.db, file)
-		cPickle.dump(self.rdb, file)
+		pickle.dump(self.db, file)
+		pickle.dump(self.rdb, file)
 
 	def qread(self, file):
 		"Quickly read the data from a pickled file"
-		self.db = cPickle.load(file)
-		self.rdb = cPickle.load(file)
+		self.db = pickle.load(file)
+		self.rdb = pickle.load(file)
 
 	def insert(self, pkg, tags):
 		self.db[pkg] = tags.copy()
