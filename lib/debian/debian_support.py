@@ -415,7 +415,10 @@ del list_releases
 def read_lines_sha1(lines):
     m = hashlib.sha1()
     for l in lines:
-        m.update(l)
+        if isinstance(l, bytes):
+            m.update(l)
+        else:
+            m.update(l.encode("UTF-8"))
     return m.hexdigest()
 
 readLinesSHA1 = function_deprecated_by(read_lines_sha1)
