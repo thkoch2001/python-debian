@@ -141,6 +141,9 @@ class DebPart(object):
     def __getitem__(self, fname):
         return self.get_content(fname)
 
+    def close(self):
+        self.__member.close()
+
 
 class DebData(DebPart):
 
@@ -274,6 +277,10 @@ class DebFile(ArFile):
                 gz.close()
                 return Changelog(raw_changelog)
         return None
+
+    def close(self):
+        self.control.close()
+        self.data.close()
 
 
 if __name__ == '__main__':

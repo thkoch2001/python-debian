@@ -694,11 +694,15 @@ Description: python modules to work with Debian-related data formats
         objects = []
         objects.append(deb822.Deb822(UNPARSED_PACKAGE))
         objects.append(deb822.Deb822(CHANGES_FILE))
-        objects.extend(deb822.Deb822.iter_paragraphs(open('test_Packages')))
-        objects.extend(deb822.Packages.iter_paragraphs(open('test_Packages')))
-        objects.extend(deb822.Deb822.iter_paragraphs(open('test_Sources')))
-        objects.extend(deb822.Deb822.iter_paragraphs(
-                         open('test_Sources.iso8859-1'), encoding="iso8859-1"))
+        with open('test_Packages') as f:
+            objects.extend(deb822.Deb822.iter_paragraphs(f))
+        with open('test_Packages') as f:
+            objects.extend(deb822.Packages.iter_paragraphs(f))
+        with open('test_Sources') as f:
+            objects.extend(deb822.Deb822.iter_paragraphs(f))
+        with open('test_Sources.iso8859-1') as f:
+            objects.extend(deb822.Deb822.iter_paragraphs(
+                f, encoding="iso8859-1"))
         for d in objects:
             for value in d.values():
                 self.assertTrue(isinstance(value, unicode))
@@ -709,17 +713,19 @@ Description: python modules to work with Debian-related data formats
         multi.append(deb822.Changes(CHANGES_FILE))
         multi.append(deb822.Changes(SIGNED_CHECKSUM_CHANGES_FILE
                                     % CHECKSUM_CHANGES_FILE))
-        multi.extend(deb822.Sources.iter_paragraphs(open('test_Sources')))
+        with open('test_Sources') as f:
+            multi.extend(deb822.Sources.iter_paragraphs(f))
         for d in multi:
             for key, value in d.items():
                 if key.lower() not in d.__class__._multivalued_fields:
                     self.assertTrue(isinstance(value, unicode))
 
     def test_encoding_integrity(self):
-        utf8 = list(deb822.Deb822.iter_paragraphs(open('test_Sources')))
-        latin1 = list(deb822.Deb822.iter_paragraphs(
-                                                open('test_Sources.iso8859-1'),
-                                                encoding='iso8859-1'))
+        with open('test_Sources') as f:
+            utf8 = list(deb822.Deb822.iter_paragraphs(f))
+        with open('test_Sources.iso8859-1') as f:
+            latin1 = list(deb822.Deb822.iter_paragraphs(
+                f, encoding='iso8859-1'))
 
         # dump() with no fd returns a unicode object - both should be identical
         self.assertEqual(len(utf8), len(latin1))
@@ -728,10 +734,10 @@ Description: python modules to work with Debian-related data formats
 
         # XXX: The way multiline fields parsing works, we can't guarantee
         # that trailing whitespace is reproduced.
-        utf8_contents = "\n".join([line.rstrip() for line in
-                                   open('test_Sources')] + [''])
-        latin1_contents = "\n".join([line.rstrip() for line in
-                                     open('test_Sources.iso8859-1')] + [''])
+        with open('test_Sources') as f:
+            utf8_contents = "\n".join([line.rstrip() for line in f] + [''])
+        with open('test_Sources.iso8859-1') as f:
+            latin1_contents = "\n".join([line.rstrip() for line in f] + [''])
 
         utf8_to_latin1 = StringIO()
         for d in utf8:
@@ -759,8 +765,12 @@ Description: python modules to work with Debian-related data formats
         warnings.filterwarnings(action='ignore', category=UnicodeWarning)
 
         filename = 'test_Sources.mixed_encoding'
-        for paragraphs in [deb822.Sources.iter_paragraphs(open(filename)),
-                           deb822.Sources.iter_paragraphs(open(filename),
+        # TODO: With Python >= 2.7, this might be better written as:
+        #   with open(filename, 'rb') as f1, open(filename, 'rb') as f2:
+        f1 = open(filename, 'rb')
+        f2 = open(filename, 'rb')
+        for paragraphs in [deb822.Sources.iter_paragraphs(f1),
+                           deb822.Sources.iter_paragraphs(f2,
                                                           use_apt_pkg=False)]:
             p1 = paragraphs.next()
             self.assertEqual(p1['maintainer'],
@@ -768,6 +778,8 @@ Description: python modules to work with Debian-related data formats
             p2 = paragraphs.next()
             self.assertEqual(p2['uploaders'],
                              u'Frank Küster <frank@debian.org>')
+        f2.close()
+        f1.close()
 
     def test_bug597249_colon_as_first_value_character(self):
         """Colon should be allowed as the first value character. See #597249.
@@ -824,7 +836,8 @@ Description: python modules to work with Debian-related data formats
 class TestPkgRelations(unittest.TestCase):
 
     def test_packages(self):
-        pkgs = deb822.Packages.iter_paragraphs(open('test_Packages'))
+        f = open('test_Packages')
+        pkgs = deb822.Packages.iter_paragraphs(f)
         pkg1 = pkgs.next()
         rel1 = {'breaks': [],
                 'conflicts': [],
@@ -884,6 +897,7 @@ class TestPkgRelations(unittest.TestCase):
             [{'arch': None, 'name': 'kwifimanager', 'version': ('>=', '4:3.5.9-2')}],
             [{'arch': None, 'name': 'librss1', 'version': ('>=', '4:3.5.9-2')}]]
         self.assertEqual(dep3, pkg3.relations['depends'])
+        f.close()
 
         bin_rels = ['file, libc6 (>= 2.7-1), libpaper1, psutils']
         src_rels = ['apache2-src (>= 2.2.9), libaprutil1-dev, ' \
@@ -899,7 +913,8 @@ class TestPkgRelations(unittest.TestCase):
                             src_rel)))
 
     def test_sources(self):
-        pkgs = deb822.Sources.iter_paragraphs(open('test_Sources'))
+        f = open('test_Sources')
+        pkgs = deb822.Sources.iter_paragraphs(f)
         pkg1 = pkgs.next()
         rel1 = {'build-conflicts': [],
                 'build-conflicts-indep': [],
@@ -938,6 +953,7 @@ class TestPkgRelations(unittest.TestCase):
                     [{'name': 'binutils-doc', 'version': None, 'arch': None}],
                     [{'name': 'binutils-source', 'version': None, 'arch': None}]]}
         self.assertEqual(rel2, pkg2.relations)
+        f.close()
 
 
 class TestGpgInfo(unittest.TestCase):

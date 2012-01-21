@@ -28,7 +28,8 @@ from debian import debtags
 class TestDebtags(unittest.TestCase):
     def mkdb(self):
         db = debtags.DB()
-        db.read(open("test_tagdb", "r"))
+        with open("test_tagdb", "r") as f:
+            db.read(f)
         return db
 
     def test_insert(self):

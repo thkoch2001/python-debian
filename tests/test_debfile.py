@@ -37,8 +37,8 @@ class TestArFile(unittest.TestCase):
     def setUp(self):
         os.system("ar r test.ar test_debfile.py test_changelog test_deb822.py >/dev/null 2>&1") 
         assert os.path.exists("test.ar")
-        self.testmembers = [ x.strip()
-                for x in os.popen("ar t test.ar").readlines() ]
+        with os.popen("ar t test.ar") as ar:
+            self.testmembers = [x.strip() for x in ar.readlines()]
         self.a = arfile.ArFile("test.ar")
 
     def tearDown(self):
@@ -77,6 +77,7 @@ class TestArFile(unittest.TestCase):
         self.assertRaises(IOError, m.seek, -1, 0)
         self.assertRaises(IOError, m.seek, -1, 1)
         m.seek(0)
+        m.close()
     
     def test_file_read(self):
         """ test for faked read """
@@ -126,6 +127,7 @@ class TestDebFile(unittest.TestCase):
         self.d = debfile.DebFile(self.debname)
 
     def tearDown(self):
+        self.d.close()
         os.unlink(self.debname)
         os.unlink(self.broken_debname)
         os.unlink(self.bz2_debname)
@@ -140,6 +142,7 @@ class TestDebFile(unittest.TestCase):
         # can access its content
         self.assertEqual(os.path.normpath(bz2_deb.data.tgz().getnames()[10]),
                          os.path.normpath('./usr/share/locale/bg/'))
+        bz2_deb.close()
 
     def test_data_names(self):
         """ test for file list equality """ 
@@ -154,8 +157,8 @@ class TestDebFile(unittest.TestCase):
 
     def test_control(self):
         """ test for control equality """
-        filecontrol = "".join(os.popen("dpkg-deb -f %s" %
-            self.debname).readlines())
+        with os.popen("dpkg-deb -f %s" % self.debname) as dpkg_deb:
+            filecontrol = "".join(dpkg_deb.readlines())
 
         self.assertEqual(self.d.control.get_content("control"), filecontrol)
 
