@@ -54,6 +54,20 @@ except ImportError:
     _mapping_mixin = DictMixin
     _mutable_mapping_mixin = DictMixin
 
+if sys.version >= '3':
+    import io
+    def _is_real_file(f):
+        if not isinstance(f, io.IOBase):
+            return False
+        try:
+            f.fileno()
+            return True
+        except (AttributeError, io.UnsupportedOperation):
+            return False
+else:
+    def _is_real_file(f):
+        return isinstance(f, file) and hasattr(f, 'fileno')
+
 
 GPGV_DEFAULT_KEYRINGS = frozenset(['/usr/share/keyrings/debian-keyring.gpg'])
 GPGV_EXECUTABLE = '/usr/bin/gpgv'
@@ -335,7 +349,7 @@ class Deb822(Deb822Dict):
             necessary in order to properly interpret the strings.)
         """
 
-        if _have_apt_pkg and use_apt_pkg and isinstance(sequence, file):
+        if _have_apt_pkg and use_apt_pkg and _is_real_file(sequence):
             parser = apt_pkg.TagFile(sequence)
             for section in parser:
                 paragraph = cls(fields=fields,
