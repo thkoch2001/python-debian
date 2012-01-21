@@ -348,7 +348,7 @@ class TestDeb822(unittest.TestCase):
     def gen_random_string(length=20):
         from random import choice
         import string
-        chars = string.letters + string.digits
+        chars = string.ascii_letters + string.digits
         return ''.join([choice(chars) for i in range(length)])
     gen_random_string = staticmethod(gen_random_string)
 
