@@ -282,7 +282,7 @@ class ArMember(object):
         cur = self.__fp.tell()
         
         if cur < self.__offset:
-            return 0L
+            return 0
         else:
             return cur - self.__offset
 

@@ -71,7 +71,7 @@ class TestArFile(unittest.TestCase):
             self.assertEqual(m.tell(), i, "failed tell()")
             
             m.seek(-i, 1)
-            self.assertEqual(m.tell(), 0L, "failed tell()")
+            self.assertEqual(m.tell(), 0, "failed tell()")
 
         m.seek(0)
         self.assertRaises(IOError, m.seek, -1, 0)
