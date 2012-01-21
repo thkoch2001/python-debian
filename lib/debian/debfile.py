@@ -19,6 +19,7 @@ from __future__ import absolute_import, print_function
 
 import gzip
 import tarfile
+import sys
 
 from debian.arfile import ArFile, ArError
 from debian.changelog import Changelog
@@ -135,8 +136,9 @@ class DebPart(object):
     def __contains__(self, fname):
         return self.has_file(fname)
 
-    def has_key(self, fname):
-        return self.has_file(fname)
+    if sys.version < '3':
+        def has_key(self, fname):
+            return self.has_file(fname)
 
     def __getitem__(self, fname):
         return self.get_content(fname)
