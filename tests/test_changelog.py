@@ -230,7 +230,7 @@ haskell-src-exts (1.8.2-2) unstable; urgency=low
         f = open('test_changelog')
         c = changelog.Changelog(f)
         f.close()
-        self.assertEqual(map(str, c._blocks), map(str, c))
+        self.assertEqual([str(b) for b in c._blocks], [str(b) for b in c])
 
     def test_len(self):
         f = open('test_changelog')

@@ -189,7 +189,7 @@ class HelperRoutineTests(unittest.TestCase):
                          '14293c9bd646a15dc656eaf8fba95124020dfada')
 
     def test_patch_lines(self):
-        file_a = map(lambda x: "%d\n" % x, range(1, 18))
+        file_a = ["%d\n" % x for x in range(1, 18)]
         file_b = ['0\n', '1\n', '<2>\n', '<3>\n', '4\n', '5\n', '7\n', '8\n',
                   '11\n', '12\n', '<13>\n', '14\n', '15\n', 'A\n', 'B\n',
                   'C\n', '16\n', '17\n',]

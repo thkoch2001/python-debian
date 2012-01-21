@@ -855,7 +855,7 @@ class PkgRelation(object):
 
         tl_deps = cls.__comma_sep_RE.split(raw.strip()) # top-level deps
         cnf = map(cls.__pipe_sep_RE.split, tl_deps)
-        return map(lambda or_deps: map(parse_rel, or_deps), cnf)
+        return [[parse_rel(or_dep) for or_dep in or_deps] for or_deps in cnf]
 
     @staticmethod
     def str(rels):

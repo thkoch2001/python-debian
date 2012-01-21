@@ -144,11 +144,10 @@ class TestDebFile(unittest.TestCase):
     def test_data_names(self):
         """ test for file list equality """ 
         tgz = self.d.data.tgz()
-        dpkg_names = map(os.path.normpath,
-                [ x.strip() for x in
-                    os.popen("dpkg-deb --fsys-tarfile %s | tar t" %
-                        self.debname).readlines() ])
-        debfile_names = map(os.path.normpath, tgz.getnames())
+        with os.popen("dpkg-deb --fsys-tarfile %s | tar t" %
+                      self.debname) as tar:
+            dpkg_names = [os.path.normpath(x.strip()) for x in tar.readlines()]
+        debfile_names = [os.path.normpath(name) for name in tgz.getnames()]
         
         # skip the root
         self.assertEqual(debfile_names[1:], dpkg_names[1:])
