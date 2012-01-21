@@ -41,7 +41,10 @@ import subprocess
 import sys
 import warnings
 
-import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import UserDict
 
 
@@ -429,7 +432,7 @@ class Deb822(Deb822Dict):
         """
 
         if fd is None:
-            fd = StringIO.StringIO()
+            fd = StringIO()
             return_string = True
         else:
             return_string = False
@@ -999,7 +1002,7 @@ class _multivalued(Deb822):
     def get_as_string(self, key):
         keyl = key.lower()
         if keyl in self._multivalued_fields:
-            fd = StringIO.StringIO()
+            fd = StringIO()
             if hasattr(self[key], 'keys'): # single-line
                 array = [ self[key] ]
             else: # multi-line
@@ -1063,7 +1066,7 @@ class _gpg_multivalued(_multivalued):
                     # Empty input
                     gpg_pre_lines = lines = gpg_post_lines = []
                 if gpg_pre_lines and gpg_post_lines:
-                    raw_text = StringIO.StringIO()
+                    raw_text = StringIO()
                     raw_text.write("\n".join(gpg_pre_lines))
                     raw_text.write("\n\n")
                     raw_text.write("\n".join(lines))

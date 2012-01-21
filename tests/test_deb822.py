@@ -25,7 +25,10 @@ import sys
 import tempfile
 import unittest
 import warnings
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 sys.path.insert(0, '../lib/')
 
