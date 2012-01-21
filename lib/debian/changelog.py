@@ -33,7 +33,14 @@ import warnings
 
 from debian import debian_support
 
-class ChangelogParseError(StandardError):
+# Python 3 doesn't have StandardError, but let's avoid changing our
+# exception inheritance hierarchy for Python 2.
+try:
+    _base_exception_class = StandardError
+except NameError:
+    _base_exception_class = Exception
+
+class ChangelogParseError(_base_exception_class):
     """Indicates that the changelog could not be parsed"""
     is_user_error = True
 
@@ -43,11 +50,11 @@ class ChangelogParseError(StandardError):
     def __str__(self):
         return "Could not parse changelog: "+self._line
 
-class ChangelogCreateError(StandardError):
+class ChangelogCreateError(_base_exception_class):
     """Indicates that changelog could not be created, as all the information
     required was not given"""
 
-class VersionError(StandardError):
+class VersionError(_base_exception_class):
     """Indicates that the version does not conform to the required format"""
 
     is_user_error = True
