@@ -44,7 +44,7 @@ if __name__ == '__main__':
             pass
         print('  %d bytes, %d lines, %s, %s' % (len(content), len(lines),
                 fname, ftype))
-    for n, v in deb.debcontrol().iteritems(): # print DEBIAN/control fields
+    for n, v in deb.debcontrol().items(): # print DEBIAN/control fields
         if n.lower() == 'description':  # increase indentation of long dsc
             lines = v.split('\n')
             short_dsc = lines[0]

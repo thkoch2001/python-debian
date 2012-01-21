@@ -30,6 +30,8 @@ try:
 except ImportError:
     from io import StringIO
 
+import six
+
 sys.path.insert(0, '../lib/')
 
 from debian import deb822
@@ -310,9 +312,9 @@ class TestDeb822Dict(unittest.TestCase):
 
         keys = ['TestKey', 'another_key', 'Third_key']
 
-        self.assertEqual(keys, d.keys())
-        self.assertEqual(keys, list(d.iterkeys()))
-        self.assertEqual(zip(keys, d.values()), d.items())
+        self.assertEqual(keys, list(d.keys()))
+        self.assertEqual(keys, list(six.iterkeys(d)))
+        self.assertEqual(list(zip(keys, d.values())), list(d.items()))
 
         keys2 = []
         for key in d:

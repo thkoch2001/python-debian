@@ -157,7 +157,7 @@ def render_file(f):
     for pkg in deb822.Packages.iter_paragraphs(f):
         print('<div class="package">')
         print('<dl class="fields">')
-        for (field, val) in pkg.iteritems():
+        for (field, val) in pkg.items():
             render_field(field, val)
         print('</dl>')
         print('</div>\n')

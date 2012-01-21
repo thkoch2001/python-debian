@@ -23,6 +23,8 @@ try:
 except ImportError:
     import pickle
 
+import six
+
 from debian.deprecation import function_deprecated_by
 
 def parse_tags(input):
@@ -265,7 +267,7 @@ class DB:
 		"""
 		res = DB()
 		db = {}
-		for pkg in filter(package_filter, self.db.iterkeys()):
+		for pkg in filter(package_filter, six.iterkeys(self.db)):
 			db[pkg] = self.db[pkg]
 		res.db = db
 		res.rdb = reverse(db)
@@ -281,7 +283,7 @@ class DB:
 		"""
 		res = DB()
 		db = {}
-		for pkg in filter(filter, self.db.iterkeys()):
+		for pkg in filter(filter, six.iterkeys(self.db)):
 			db[pkg] = self.db[pkg].copy()
 		res.db = db
 		res.rdb = reverse(db)
@@ -297,7 +299,7 @@ class DB:
 		"""
 		res = DB()
 		db = {}
-		for pkg, tags in filter(package_tag_filter, self.db.iteritems()):
+		for pkg, tags in filter(package_tag_filter, six.iteritems(self.db)):
 			db[pkg] = self.db[pkg]
 		res.db = db
 		res.rdb = reverse(db)
@@ -313,7 +315,7 @@ class DB:
 		"""
 		res = DB()
 		db = {}
-		for pkg, tags in filter(package_tag_filter, self.db.iteritems()):
+		for pkg, tags in filter(package_tag_filter, six.iteritems(self.db)):
 			db[pkg] = self.db[pkg].copy()
 		res.db = db
 		res.rdb = reverse(db)
@@ -329,7 +331,7 @@ class DB:
 		"""
 		res = DB()
 		rdb = {}
-		for tag in filter(tag_filter, self.rdb.iterkeys()):
+		for tag in filter(tag_filter, six.iterkeys(self.rdb)):
 			rdb[tag] = self.rdb[tag]
 		res.rdb = rdb
 		res.db = reverse(rdb)
@@ -345,7 +347,7 @@ class DB:
 		"""
 		res = DB()
 		rdb = {}
-		for tag in filter(tag_filter, self.rdb.iterkeys()):
+		for tag in filter(tag_filter, six.iterkeys(self.rdb)):
 			rdb[tag] = self.rdb[tag].copy()
 		res.rdb = rdb
 		res.db = reverse(rdb)
@@ -422,25 +424,25 @@ class DB:
 
 	def iter_packages(self):
 		"""Iterate over the packages"""
-		return self.db.iterkeys()
+		return six.iterkeys(self.db)
 
 	iterPackages = function_deprecated_by(iter_packages)
 
 	def iter_tags(self):
 		"""Iterate over the tags"""
-		return self.rdb.iterkeys()
+		return six.iterkeys(self.rdb)
 
 	iterTags = function_deprecated_by(iter_tags)
 
 	def iter_packages_tags(self):
 		"""Iterate over 2-tuples of (pkg, tags)"""
-		return self.db.iteritems()
+		return six.iteritems(self.db)
 
 	iterPackagesTags = function_deprecated_by(iter_packages_tags)
 
 	def iter_tags_packages(self):
 		"""Iterate over 2-tuples of (tag, pkgs)"""
-		return self.rdb.iteritems()
+		return six.iteritems(self.rdb)
 
 	iterTagsPackages = function_deprecated_by(iter_tags_packages)
 

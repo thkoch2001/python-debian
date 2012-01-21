@@ -8,7 +8,7 @@ Uploaders: Adeodato Simó <dato@net.com.org.es>,
  Reinhard Tartler <siretart@tauware.de>,
  Stefano Zacchiroli <zack@debian.org>,
  John Wright <jsw@debian.org>
-Build-Depends: debhelper (>= 5.0.37.2), python (>= 2.6.6-3~), python-setuptools, python-chardet
+Build-Depends: debhelper (>= 5.0.37.2), python (>= 2.6.6-3~), python-setuptools, python-chardet, python-six
 Standards-Version: 3.8.4
 Vcs-Browser: http://git.debian.org/?p=pkg-python-debian/python-debian.git
 Vcs-Git: git://git.debian.org/git/pkg-python-debian/python-debian.git
@@ -16,7 +16,7 @@ X-Python-Version: >= 2.5
 
 Package: python-debian
 Architecture: all
-Depends: ${python:Depends}, ${misc:Depends}, python-chardet
+Depends: ${python:Depends}, ${misc:Depends}, python-chardet, python-six
 Recommends: python-apt
 Suggests: gpgv
 Provides: python-deb822
