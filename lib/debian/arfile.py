@@ -17,11 +17,13 @@
 
 from __future__ import print_function
 
-GLOBAL_HEADER = "!<arch>\n"
+import sys
+
+GLOBAL_HEADER = b"!<arch>\n"
 GLOBAL_HEADER_LENGTH = len(GLOBAL_HEADER)
 
 FILE_HEADER_LENGTH = 60
-FILE_MAGIC = "`\n"
+FILE_MAGIC = b"`\n"
 
 class ArError(Exception):
     pass
@@ -36,14 +38,30 @@ class ArFile(object):
         - members       same as getmembers()
     """
 
-    def __init__(self, filename=None, mode='r', fileobj=None):
+    def __init__(self, filename=None, mode='r', fileobj=None,
+                 encoding=None, errors=None):
         """ Build an ar file representation starting from either a filename or
-        an existing file object. The only supported mode is 'r' """
+        an existing file object. The only supported mode is 'r'.
+
+        In Python 3, the encoding and errors parameters control how member
+        names are decoded into Unicode strings. Like tarfile, the default
+        encoding is sys.getfilesystemencoding() and the default error handling
+        scheme is 'surrogateescape' (>= 3.2) or 'strict' (< 3.2).
+        """
 
         self.__members = [] 
         self.__members_dict = {}
         self.__fname = filename
         self.__fileobj = fileobj
+        if encoding is None:
+            encoding = sys.getfilesystemencoding()
+        self.__encoding = encoding
+        if errors is None:
+            if sys.version >= '3.2':
+                errors = 'surrogateescape'
+            else:
+                errors = 'strict'
+        self.__errors = errors
         
         if mode == "r":
             self.__index_archive()
@@ -61,7 +79,9 @@ class ArFile(object):
             raise ArError("Unable to find global header")
 
         while True:
-            newmember = ArMember.from_file(fp, self.__fname)
+            newmember = ArMember.from_file(fp, self.__fname,
+                                           encoding=self.__encoding,
+                                           errors=self.__errors)
             if not newmember:
                 break
             self.__members.append(newmember)
@@ -162,7 +182,7 @@ class ArMember(object):
         self.__offset = None    # start-of-data offset
         self.__end = None       # end-of-data offset
 
-    def from_file(fp, fname):
+    def from_file(fp, fname, encoding=None, errors=None):
         """fp is an open File object positioned on a valid file header inside
         an ar archive. Return a new ArMember on success, None otherwise. """
 
@@ -178,6 +198,15 @@ class ArMember(object):
         if buf[58:60] != FILE_MAGIC:
             raise IOError("Incorrect file magic")
 
+        if sys.version >= '3':
+            if encoding is None:
+                encoding = sys.getfilesystemencoding()
+            if errors is None:
+                if sys.version >= '3.2':
+                    errors = 'surrogateescape'
+                else:
+                    errors = 'strict'
+
         # http://en.wikipedia.org/wiki/Ar_(Unix)    
         #from   to     Name                      Format
         #0      15     File name                 ASCII
@@ -190,7 +219,9 @@ class ArMember(object):
 
         # XXX struct.unpack can be used as well here
         f = ArMember()
-        f.__name = buf[0:16].split("/")[0].strip()
+        f.__name = buf[0:16].split(b"/")[0].strip()
+        if sys.version >= '3':
+            f.__name = f.__name.decode(encoding, errors)
         f.__mtime = int(buf[16:28])
         f.__owner = int(buf[28:34])
         f.__group = int(buf[34:40])
@@ -210,7 +241,7 @@ class ArMember(object):
     # XXX this is not a sequence like file objects
     def read(self, size=0):
         if self.__fp is None:
-            self.__fp = open(self.__fname, "r")
+            self.__fp = open(self.__fname, "rb")
             self.__fp.seek(self.__offset)
 
         cur = self.__fp.tell()
@@ -219,31 +250,31 @@ class ArMember(object):
             return self.__fp.read(size)
 
         if cur >= self.__end or cur < self.__offset:
-            return ''
+            return b''
 
         return self.__fp.read(self.__end - cur)
 
     def readline(self, size=None):
         if self.__fp is None:
-            self.__fp = open(self.__fname, "r")
+            self.__fp = open(self.__fname, "rb")
             self.__fp.seek(self.__offset)
 
         if size is not None: 
             buf = self.__fp.readline(size)
             if self.__fp.tell() > self.__end:
-                return ''
+                return b''
 
             return buf
 
         buf = self.__fp.readline()
         if self.__fp.tell() > self.__end:
-            return ''
+            return b''
         else:
             return buf
 
     def readlines(self, sizehint=0):
         if self.__fp is None:
-            self.__fp = open(self.__fname, "r")
+            self.__fp = open(self.__fname, "rb")
             self.__fp.seek(self.__offset)
         
         buf = None
@@ -258,7 +289,7 @@ class ArMember(object):
 
     def seek(self, offset, whence=0):
         if self.__fp is None:
-            self.__fp = open(self.__fname, "r")
+            self.__fp = open(self.__fname, "rb")
             self.__fp.seek(self.__offset)
 
         if self.__fp.tell() < self.__offset:
@@ -276,7 +307,7 @@ class ArMember(object):
 
     def tell(self):
         if self.__fp is None:
-            self.__fp = open(self.__fname, "r")
+            self.__fp = open(self.__fname, "rb")
             self.__fp.seek(self.__offset)
 
         cur = self.__fp.tell()
