@@ -45,14 +45,21 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-import UserDict
+try:
+    from collections import Mapping, MutableMapping
+    _mapping_mixin = Mapping
+    _mutable_mapping_mixin = MutableMapping
+except ImportError:
+    from UserDict import DictMixin
+    _mapping_mixin = DictMixin
+    _mutable_mapping_mixin = DictMixin
 
 
 GPGV_DEFAULT_KEYRINGS = frozenset(['/usr/share/keyrings/debian-keyring.gpg'])
 GPGV_EXECUTABLE = '/usr/bin/gpgv'
 
 
-class TagSectionWrapper(object, UserDict.DictMixin):
+class TagSectionWrapper(_mapping_mixin, object):
     """Wrap a TagSection object, using its find_raw method to get field values
 
     This allows us to pick which whitespace to strip off the beginning and end
@@ -62,9 +69,14 @@ class TagSectionWrapper(object, UserDict.DictMixin):
     def __init__(self, section):
         self.__section = section
 
-    def keys(self):
-        return [key for key in self.__section.keys()
-                if not key.startswith('#')]
+    def __iter__(self):
+        for key in self.__section.keys():
+            if not key.startswith('#'):
+                yield key
+
+    def __len__(self):
+        return len([key for key in self.__section.keys()
+                    if not key.startswith('#')])
 
     def __getitem__(self, key):
         s = self.__section.find_raw(key)
@@ -111,6 +123,9 @@ class OrderedSet(object):
         # Return an iterator of items in the order they were added
         return iter(self.__order)
 
+    def __len__(self):
+        return len(self.__order)
+
     def __contains__(self, item):
         # This is what makes OrderedSet faster than using a list to keep track
         # of keys.  Lookup in a set is O(1) instead of O(n) for a list.
@@ -125,10 +140,10 @@ class OrderedSet(object):
     ###
 
 
-class Deb822Dict(object, UserDict.DictMixin):
-    # Subclassing UserDict.DictMixin because we're overriding so much dict
-    # functionality that subclassing dict requires overriding many more than
-    # the four methods that DictMixin requires.
+class Deb822Dict(_mutable_mapping_mixin, object):
+    # Subclassing _mutable_mapping_mixin because we're overriding so much
+    # dict functionality that subclassing dict requires overriding many more
+    # than the methods that _mutable_mapping_mixin requires.
     """A dictionary-like object suitable for storing RFC822-like data.
 
     Deb822Dict behaves like a normal dict, except:
@@ -175,7 +190,14 @@ class Deb822Dict(object, UserDict.DictMixin):
             else:
                 self.__keys.extend([ _strI(f) for f in _fields if f in self.__parsed ])
         
-    ### BEGIN DictMixin methods
+    ### BEGIN _mutable_mapping_mixin methods
+
+    def __iter__(self):
+        for key in self.__keys:
+            yield str(key)
+
+    def __len__(self):
+        return len(self.__keys)
 
     def __setitem__(self, key, value):
         key = _strI(key)
@@ -229,10 +251,7 @@ class Deb822Dict(object, UserDict.DictMixin):
         key = _strI(key)
         return key in self.__keys
     
-    def keys(self):
-        return [str(key) for key in self.__keys]
-    
-    ### END DictMixin methods
+    ### END _mutable_mapping_mixin methods
 
     def __repr__(self):
         return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
