@@ -797,7 +797,7 @@ class GpgInfo(dict):
         # Peek at the first line to see if it's newline-terminated.
         sequence_iter = iter(sequence)
         try:
-            first_line = sequence_iter.next()
+            first_line = next(sequence_iter)
         except StopIteration:
             return ""
         join_str = '\n'

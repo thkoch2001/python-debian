@@ -490,7 +490,7 @@ class TestDeb822(unittest.TestCase):
 
     def test_iter_paragraphs_empty_input(self):
         generator = deb822.Deb822.iter_paragraphs([])
-        self.assertRaises(StopIteration, generator.next)
+        self.assertRaises(StopIteration, next, generator)
 
     def test_parser_limit_fields(self):
         wanted_fields = [ 'Package', 'MD5sum', 'Filename', 'Description' ]
@@ -772,10 +772,10 @@ Description: python modules to work with Debian-related data formats
         for paragraphs in [deb822.Sources.iter_paragraphs(f1),
                            deb822.Sources.iter_paragraphs(f2,
                                                           use_apt_pkg=False)]:
-            p1 = paragraphs.next()
+            p1 = next(paragraphs)
             self.assertEqual(p1['maintainer'],
                              u'Adeodato Simó <dato@net.com.org.es>')
-            p2 = paragraphs.next()
+            p2 = next(paragraphs)
             self.assertEqual(p2['uploaders'],
                              u'Frank Küster <frank@debian.org>')
         f2.close()
@@ -838,7 +838,7 @@ class TestPkgRelations(unittest.TestCase):
     def test_packages(self):
         f = open('test_Packages')
         pkgs = deb822.Packages.iter_paragraphs(f)
-        pkg1 = pkgs.next()
+        pkg1 = next(pkgs)
         rel1 = {'breaks': [],
                 'conflicts': [],
                 'depends': [[{'name': 'file', 'version': None, 'arch': None}],
@@ -864,7 +864,7 @@ class TestPkgRelations(unittest.TestCase):
                     [{'name': 't1-cyrillic', 'version': None, 'arch': None}],
                     [{'name': 'texlive-base-bin', 'version': None, 'arch': None}]]}
         self.assertEqual(rel1, pkg1.relations)
-        pkg2 = pkgs.next()
+        pkg2 = next(pkgs)
         rel2 = {'breaks': [],
                 'conflicts': [],
                 'depends': [[{'name': 'lrzsz', 'version': None, 'arch': None}],
@@ -881,7 +881,7 @@ class TestPkgRelations(unittest.TestCase):
                 'replaces': [],
                 'suggests': []}
         self.assertEqual(rel2, pkg2.relations)
-        pkg3 = pkgs.next()
+        pkg3 = next(pkgs)
         dep3 = [[{'arch': None, 'name': 'dcoprss', 'version': ('>=', '4:3.5.9-2')}],
             [{'arch': None, 'name': 'kdenetwork-kfile-plugins', 'version': ('>=', '4:3.5.9-2')}],
             [{'arch': None, 'name': 'kdict', 'version': ('>=', '4:3.5.9-2')}],
@@ -915,7 +915,7 @@ class TestPkgRelations(unittest.TestCase):
     def test_sources(self):
         f = open('test_Sources')
         pkgs = deb822.Sources.iter_paragraphs(f)
-        pkg1 = pkgs.next()
+        pkg1 = next(pkgs)
         rel1 = {'build-conflicts': [],
                 'build-conflicts-indep': [],
                 'build-depends': [[{'name': 'apache2-src', 'version': ('>=', '2.2.9'), 'arch': None}],
@@ -928,7 +928,7 @@ class TestPkgRelations(unittest.TestCase):
                 'build-depends-indep': [],
                 'binary': [[{'name': 'apache2-mpm-itk', 'version': None, 'arch': None}]]}
         self.assertEqual(rel1, pkg1.relations)
-        pkg2 = pkgs.next()
+        pkg2 = next(pkgs)
         rel2 = {'build-conflicts': [],
                 'build-conflicts-indep': [],
                 'build-depends': [[{'name': 'dpkg-dev', 'version': ('>=', '1.13.9'), 'arch': None}],
