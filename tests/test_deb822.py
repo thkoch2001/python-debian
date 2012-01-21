@@ -27,8 +27,9 @@ import unittest
 import warnings
 try:
     from StringIO import StringIO
+    BytesIO = StringIO
 except ImportError:
-    from io import StringIO
+    from io import BytesIO, StringIO
 
 import six
 
@@ -146,7 +147,7 @@ CcYAoOLYDF5G1h3oR1iDNyeCI6hRW03S
     ]
 
 
-CHANGES_FILE = u'''\
+CHANGES_FILE = six.u('''\
 Format: 1.7
 Date: Fri, 28 Dec 2007 17:08:48 +0100
 Source: bzr-gtk
@@ -171,7 +172,7 @@ Files:
  0fd797f4138a9d4fdeb8c30597d46bc9 1003 python optional bzr-gtk_0.93.0-2.dsc
  d9523676ae75c4ced299689456f252f4 3860 python optional bzr-gtk_0.93.0-2.diff.gz
  8960459940314b21019dedd5519b47a5 168544 python optional bzr-gtk_0.93.0-2_all.deb
-'''
+''')
 
 CHECKSUM_CHANGES_FILE = '''\
 Format: 1.8
@@ -276,6 +277,14 @@ PARSED_PARAGRAPHS_WITH_COMMENTS = [
 ]
 
 
+def open_utf8(filename, mode='r'):
+    """Open a UTF-8 text file in text mode."""
+    if sys.version < '3':
+        return open(filename, mode=mode)
+    else:
+        return open(filename, mode=mode, encoding='UTF-8')
+
+
 class TestDeb822Dict(unittest.TestCase):
     def make_dict(self):
         d = deb822.Deb822Dict()
@@ -330,7 +339,7 @@ class TestDeb822Dict(unittest.TestCase):
 
     def test_unicode_key_access(self):
         d = self.make_dict()
-        self.assertEqual(1, d[u'testkey'])
+        self.assertEqual(1, d[six.u('testkey')])
 
 
 class TestDeb822(unittest.TestCase):
@@ -439,30 +448,30 @@ class TestDeb822(unittest.TestCase):
     def _test_iter_paragraphs(self, filename, cls, **kwargs):
         """Ensure iter_paragraphs consistency"""
         
-        f = open(filename)
+        f = open(filename, 'rb')
         packages_content = f.read()
         f.close()
         # XXX: The way multivalued fields parsing works, we can't guarantee
         # that trailing whitespace is reproduced.
-        packages_content = "\n".join([line.rstrip() for line in
-                                      packages_content.splitlines()] + [''])
+        packages_content = b"\n".join([line.rstrip() for line in
+                                       packages_content.splitlines()] + [b''])
 
-        s = StringIO()
+        s = BytesIO()
         l = []
-        f = open(filename)
+        f = open_utf8(filename)
         for p in cls.iter_paragraphs(f, **kwargs):
             p.dump(s)
-            s.write("\n")
+            s.write(b"\n")
             l.append(p)
         f.close()
         self.assertEqual(s.getvalue(), packages_content)
         if kwargs["shared_storage"] is False:
             # If shared_storage is False, data should be consistent across
             # iterations -- i.e. we can use "old" objects
-            s = StringIO()
+            s = BytesIO()
             for p in l:
                 p.dump(s)
-                s.write("\n")
+                s.write(b"\n")
             self.assertEqual(s.getvalue(), packages_content)
 
     def test_iter_paragraphs_apt_shared_storage_packages(self):
@@ -694,18 +703,18 @@ Description: python modules to work with Debian-related data formats
         objects = []
         objects.append(deb822.Deb822(UNPARSED_PACKAGE))
         objects.append(deb822.Deb822(CHANGES_FILE))
-        with open('test_Packages') as f:
+        with open_utf8('test_Packages') as f:
             objects.extend(deb822.Deb822.iter_paragraphs(f))
-        with open('test_Packages') as f:
+        with open_utf8('test_Packages') as f:
             objects.extend(deb822.Packages.iter_paragraphs(f))
-        with open('test_Sources') as f:
+        with open_utf8('test_Sources') as f:
             objects.extend(deb822.Deb822.iter_paragraphs(f))
         with open('test_Sources.iso8859-1') as f:
             objects.extend(deb822.Deb822.iter_paragraphs(
                 f, encoding="iso8859-1"))
         for d in objects:
             for value in d.values():
-                self.assertTrue(isinstance(value, unicode))
+                self.assertTrue(isinstance(value, six.text_type))
 
         # The same should be true for Sources and Changes except for their
         # _multivalued fields
@@ -713,15 +722,15 @@ Description: python modules to work with Debian-related data formats
         multi.append(deb822.Changes(CHANGES_FILE))
         multi.append(deb822.Changes(SIGNED_CHECKSUM_CHANGES_FILE
                                     % CHECKSUM_CHANGES_FILE))
-        with open('test_Sources') as f:
+        with open_utf8('test_Sources') as f:
             multi.extend(deb822.Sources.iter_paragraphs(f))
         for d in multi:
             for key, value in d.items():
                 if key.lower() not in d.__class__._multivalued_fields:
-                    self.assertTrue(isinstance(value, unicode))
+                    self.assertTrue(isinstance(value, six.text_type))
 
     def test_encoding_integrity(self):
-        with open('test_Sources') as f:
+        with open_utf8('test_Sources') as f:
             utf8 = list(deb822.Deb822.iter_paragraphs(f))
         with open('test_Sources.iso8859-1') as f:
             latin1 = list(deb822.Deb822.iter_paragraphs(
@@ -734,20 +743,20 @@ Description: python modules to work with Debian-related data formats
 
         # XXX: The way multiline fields parsing works, we can't guarantee
         # that trailing whitespace is reproduced.
-        with open('test_Sources') as f:
-            utf8_contents = "\n".join([line.rstrip() for line in f] + [''])
-        with open('test_Sources.iso8859-1') as f:
-            latin1_contents = "\n".join([line.rstrip() for line in f] + [''])
+        with open('test_Sources', 'rb') as f:
+            utf8_contents = b"\n".join([line.rstrip() for line in f] + [b''])
+        with open('test_Sources.iso8859-1', 'rb') as f:
+            latin1_contents = b"\n".join([line.rstrip() for line in f] + [b''])
 
-        utf8_to_latin1 = StringIO()
+        utf8_to_latin1 = BytesIO()
         for d in utf8:
             d.dump(fd=utf8_to_latin1, encoding='iso8859-1')
-            utf8_to_latin1.write("\n")
+            utf8_to_latin1.write(b"\n")
 
-        latin1_to_utf8 = StringIO()
+        latin1_to_utf8 = BytesIO()
         for d in latin1:
             d.dump(fd=latin1_to_utf8, encoding='utf-8')
-            latin1_to_utf8.write("\n")
+            latin1_to_utf8.write(b"\n")
 
         self.assertEqual(utf8_contents, latin1_to_utf8.getvalue())
         self.assertEqual(latin1_contents, utf8_to_latin1.getvalue())
@@ -774,10 +783,10 @@ Description: python modules to work with Debian-related data formats
                                                           use_apt_pkg=False)]:
             p1 = next(paragraphs)
             self.assertEqual(p1['maintainer'],
-                             u'Adeodato Simó <dato@net.com.org.es>')
+                             six.u('Adeodato Sim\xf3 <dato@net.com.org.es>'))
             p2 = next(paragraphs)
             self.assertEqual(p2['uploaders'],
-                             u'Frank Küster <frank@debian.org>')
+                             six.u('Frank K\xfcster <frank@debian.org>'))
         f2.close()
         f1.close()
 
@@ -913,7 +922,7 @@ class TestPkgRelations(unittest.TestCase):
                             src_rel)))
 
     def test_sources(self):
-        f = open('test_Sources')
+        f = open_utf8('test_Sources')
         pkgs = deb822.Sources.iter_paragraphs(f)
         pkg1 = next(pkgs)
         rel1 = {'build-conflicts': [],

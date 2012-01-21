@@ -54,6 +54,8 @@ except ImportError:
     _mapping_mixin = DictMixin
     _mutable_mapping_mixin = DictMixin
 
+import six
+
 if sys.version >= '3':
     import io
     def _is_real_file(f):
@@ -228,7 +230,7 @@ class Deb822Dict(_mutable_mapping_mixin, object):
             else:
                 raise
 
-        if isinstance(value, str):
+        if isinstance(value, bytes):
             # Always return unicode objects instead of strings
             try:
                 value = value.decode(self.encoding)
@@ -394,7 +396,7 @@ class Deb822(Deb822Dict):
 
         wanted_field = lambda f: fields is None or f in fields
 
-        if isinstance(sequence, basestring):
+        if isinstance(sequence, six.string_types):
             sequence = sequence.splitlines()
 
         curkey = None
@@ -442,6 +444,10 @@ class Deb822(Deb822Dict):
     def __unicode__(self):
         return self.dump()
 
+    if sys.version >= '3':
+        def __bytes__(self):
+            return self.dump().encode(self.encoding)
+
     # __repr__ is handled by Deb822Dict
 
     def get_as_string(self, key):
@@ -451,7 +457,7 @@ class Deb822(Deb822Dict):
         this can be overridden in subclasses (e.g. _multivalued) that can take
         special values.
         """
-        return unicode(self[key])
+        return six.text_type(self[key])
 
     def dump(self, fd=None, encoding=None):
         """Dump the the contents in the original format
@@ -722,9 +728,9 @@ class GpgInfo(dict):
 
         n = cls()
 
-        if isinstance(out, basestring):
+        if isinstance(out, six.string_types):
             out = out.split('\n')
-        if isinstance(err, basestring):
+        if isinstance(err, six.string_types):
             err = err.split('\n')
 
         n.out = out
@@ -777,13 +783,17 @@ class GpgInfo(dict):
             raise IOError("cannot access any of the given keyrings")
 
         p = subprocess.Popen(args, stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             universal_newlines=True)
         # XXX what to do with exit code?
 
-        if isinstance(sequence, basestring):
-            (out, err) = p.communicate(sequence)
+        if isinstance(sequence, six.string_types):
+            inp = sequence
         else:
-            (out, err) = p.communicate(cls._get_full_string(sequence))
+            inp = cls._get_full_string(sequence)
+        if sys.version >= '3':
+            inp = inp.encode('UTF-8')
+        out, err = p.communicate(inp)
 
         return cls.from_output(out, err)
 
@@ -1049,7 +1059,7 @@ class _multivalued(Deb822):
                 field_lengths = {}
             for item in array:
                 for x in order:
-                    raw_value = unicode(item[x])
+                    raw_value = six.text_type(item[x])
                     try:
                         length = field_lengths[keyl][x]
                     except KeyError:
@@ -1085,7 +1095,7 @@ class _gpg_multivalued(_multivalued):
             sequence = kwargs.get("sequence", None)
 
         if sequence is not None:
-            if isinstance(sequence, basestring):
+            if isinstance(sequence, six.string_types):
                 self.raw_text = sequence
             elif hasattr(sequence, "items"):
                 # sequence is actually a dict(-like) object, so we don't have
