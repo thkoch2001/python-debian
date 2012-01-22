@@ -709,7 +709,7 @@ Description: python modules to work with Debian-related data formats
             objects.extend(deb822.Packages.iter_paragraphs(f))
         with open_utf8('test_Sources') as f:
             objects.extend(deb822.Deb822.iter_paragraphs(f))
-        with open('test_Sources.iso8859-1') as f:
+        with open('test_Sources.iso8859-1', 'rb') as f:
             objects.extend(deb822.Deb822.iter_paragraphs(
                 f, encoding="iso8859-1"))
         for d in objects:
@@ -732,7 +732,7 @@ Description: python modules to work with Debian-related data formats
     def test_encoding_integrity(self):
         with open_utf8('test_Sources') as f:
             utf8 = list(deb822.Deb822.iter_paragraphs(f))
-        with open('test_Sources.iso8859-1') as f:
+        with open('test_Sources.iso8859-1', 'rb') as f:
             latin1 = list(deb822.Deb822.iter_paragraphs(
                 f, encoding='iso8859-1'))
 
@@ -976,6 +976,7 @@ class TestGpgInfo(unittest.TestCase):
             os.path.exists('/usr/share/keyrings/debian-keyring.gpg'))
 
         self.data = SIGNED_CHECKSUM_CHANGES_FILE % CHECKSUM_CHANGES_FILE
+        self.data = self.data.encode()
         self.valid = {
             'GOODSIG':
                 ['D14219877A786561', 'John Wright <john.wright@hp.com>'],
@@ -1008,7 +1009,7 @@ class TestGpgInfo(unittest.TestCase):
         if not self.should_run:
             return
 
-        sequence = StringIO(self.data)
+        sequence = BytesIO(self.data)
         gpg_info = deb822.GpgInfo.from_sequence(sequence)
         self._validate_gpg_info(gpg_info)
 
@@ -1025,7 +1026,7 @@ class TestGpgInfo(unittest.TestCase):
             return
 
         fd, filename = tempfile.mkstemp()
-        fp = os.fdopen(fd, 'w')
+        fp = os.fdopen(fd, 'wb')
         fp.write(self.data)
         fp.close()
 
