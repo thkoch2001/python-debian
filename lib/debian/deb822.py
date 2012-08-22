@@ -818,7 +818,7 @@ class GpgInfo(dict):
 
         p = subprocess.Popen(args, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                             universal_newlines=True)
+                             universal_newlines=False)
         # XXX what to do with exit code?
 
         if isinstance(sequence, bytes):
@@ -827,7 +827,8 @@ class GpgInfo(dict):
             inp = cls._get_full_bytes(sequence)
         out, err = p.communicate(inp)
 
-        return cls.from_output(out, err)
+        return cls.from_output(out.decode('utf-8'),
+                               err.decode('utf-8'))
 
     @staticmethod
     def _get_full_bytes(sequence):
