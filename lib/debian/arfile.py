@@ -317,6 +317,9 @@ class ArMember(object):
         else:
             return cur - self.__offset
 
+    def seekable(self):
+        return True
+
     def close(self):
         if self.__fp is not None:
             self.__fp.close()
