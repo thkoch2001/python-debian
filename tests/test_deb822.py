@@ -841,6 +841,16 @@ Description: python modules to work with Debian-related data formats
             UNPARSED_PARAGRAPHS_WITH_COMMENTS.splitlines(), use_apt_pkg=False))
         self._test_iter_paragraphs_comments(paragraphs)
 
+    def test_iter_paragraphs_string_comments_use_apt_pkg(self):
+        paragraphs = list(deb822.Deb822.iter_paragraphs(
+            UNPARSED_PARAGRAPHS_WITH_COMMENTS, use_apt_pkg=True))
+        self._test_iter_paragraphs_comments(paragraphs)
+
+    def test_iter_paragraphs_string_comments_native(self):
+        paragraphs = list(deb822.Deb822.iter_paragraphs(
+            UNPARSED_PARAGRAPHS_WITH_COMMENTS, use_apt_pkg=False))
+        self._test_iter_paragraphs_comments(paragraphs)
+
 
 class TestPkgRelations(unittest.TestCase):
 

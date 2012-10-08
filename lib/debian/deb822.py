@@ -376,6 +376,8 @@ class Deb822(Deb822Dict):
                     yield paragraph
 
         else:
+            if isinstance(sequence, six.string_types):
+                sequence = sequence.splitlines()
             iterable = iter(sequence)
             x = cls(iterable, fields, encoding=encoding)
             while len(x) != 0:
