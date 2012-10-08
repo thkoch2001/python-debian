@@ -134,13 +134,20 @@ class ArFile(object):
         can be specified either as a string (its name) or as a ArMember
         instance. """
 
+        # TODO(jsw): What is the point of this method?  It differs from
+        # getmember in the following ways:
+        #  - It returns the *first* member with the given name instead of the
+        #    last.
+        #  - If member is an ArMember, it uses that ArMember's name as the key.
+        # The former just seems confusing (and this implementation less
+        # efficient than getmember's - probably historical), and I'm having a
+        # hard time seeing the use-case for the latter.
         for m in self.__members:
             if isinstance(member, ArMember) and m.name == member.name:
                 return m
             elif member == m.name:
                 return m
-            else:
-                return None 
+        return None
 
     # container emulation
 

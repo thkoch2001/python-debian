@@ -1,6 +1,9 @@
 python-debian (0.1.22) UNRELEASED; urgency=low
 
   * Acknowledge NMU.  (Thanks for your work, Colin!)
+  * arfile.ArFile.extractfile: Return a matching member even if it is
+    not the first one in the archive.  Thanks to Mika Eloranta for the
+    report and patch. (Closes: #689313)
 
  -- John Wright <jsw@debian.org>  Mon, 08 Oct 2012 00:41:32 -0700
 
