@@ -31,8 +31,7 @@ import unittest
 
 import six
 
-sys.path.insert(0, '../lib/')
-
+from .context import debian
 from debian import changelog
 
 
@@ -311,5 +310,3 @@ class VersionTests(unittest.TestCase):
         self.assertEqual(v.upstream_version, '1.4.1')
         self.assertEqual(v.debian_version, '1')
 
-if __name__ == '__main__':
-    unittest.main()

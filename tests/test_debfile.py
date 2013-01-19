@@ -31,8 +31,8 @@ import six
 
 sys.path.insert(0, '../lib/')
 
-from debian import arfile
-from debian import debfile
+from .context import debian
+from debian import arfile, debfile
 
 class TestArFile(unittest.TestCase):
 
@@ -180,7 +180,4 @@ class TestDebFile(unittest.TestCase):
                 '9c1a72a78f82216a0305b6c90ab71058')
         self.assertEqual(md5[six.u('usr/share/locale/zh_TW/LC_MESSAGES/hello.mo')],
                 'a7356e05bd420872d03cd3f5369de42f')
-
-if __name__ == '__main__':
-    unittest.main()
 

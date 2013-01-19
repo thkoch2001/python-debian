@@ -23,8 +23,7 @@ from __future__ import absolute_import
 import sys
 import unittest
 
-sys.path.insert(0, '../lib/')
-
+from .context import debian
 from debian import debian_support
 from debian.debian_support import *
 
@@ -199,6 +198,3 @@ class HelperRoutineTests(unittest.TestCase):
         patch_lines(file_a, patches_from_ed_script(patch))
         self.assertEqual(''.join(file_b), ''.join(file_a))
 
-
-if __name__ == "__main__":
-    unittest.main()

@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import sys
 import unittest
 
-sys.path.insert(0, '../lib/')
+from .context import debian
 from debian import debtags
 
 class TestDebtags(unittest.TestCase):
@@ -69,8 +69,5 @@ class TestDebtags(unittest.TestCase):
         assert "polygen" in db.packages_of_tag("interface::commandline")
         self.assertEqual(db.package_count(), 144)
         self.assertEqual(db.tag_count(), 94)
-
-if __name__ == '__main__':
-    unittest.main()
 
 # vim:set ts=4 sw=4 expandtab:

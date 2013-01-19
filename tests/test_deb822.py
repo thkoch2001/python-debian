@@ -33,8 +33,7 @@ except ImportError:
 
 import six
 
-sys.path.insert(0, '../lib/')
-
+from .context import debian
 from debian import deb822
 
 
@@ -1047,6 +1046,3 @@ class TestGpgInfo(unittest.TestCase):
 
         self._validate_gpg_info(gpg_info)
 
-
-if __name__ == '__main__':
-    unittest.main()
