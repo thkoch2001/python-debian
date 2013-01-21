@@ -1,5 +1,6 @@
 import re
-from itertools import imap, ifilter, islice, repeat
+from itertools import imap, ifilter, islice, repeat, dropwhile
+import itertools
 from operator import itemgetter
 
 # TODO also filter git diffstat/numstat from header!
@@ -51,8 +52,40 @@ class Header(object):
         """Sets the value of a header field, taking care of hyphen/underscore translation."""
         self.fields[name] = value
 
+    def append(self, name, item):
+        """Appends item to the list of a multivalue field (from, author, reviewed-by, acked-by)."""
+        self.fields[name].append(item)
+
+    def _setdata(self, key, data):
+        """Adds the data for key either appending to a list or setting for singe values."""
+        if key in self.SINGLE_FIELDS_LIST:
+            self.set(key, data)
+        elif key in self.MULTI_FIELDS_LIST:
+            self.append(key, data)
+        elif key.startswith("bug-"):
+            self.get("vendor-bugs")[key[4:]] = data
+        else:
+            raise "should not happen: " + key
+
     def __repr__(self):
         self.format()
+
+    def add_missing_info(self, author, last_update):
+
+        """Adds author and last-update info to the fields in case it's missing.
+
+        If the last-update field is already set, it will not be overwritten.
+        The author info is only added if there is an empty from or author field.
+        """
+
+        if not self.get("last-update"):
+            self.set("last-update", last_update)
+
+        for field in ['author', 'from']:
+            targetlist = self.get(field)
+            found = _replace_first_in_list(targetlist, "", author)
+            if found:
+                break
 
     def format(self):
         """Returns a dep3 conforming representation of this patch header."""
@@ -72,7 +105,7 @@ class Header(object):
                 repr += imap(formatter, repeat(field), value)
             elif "vendor-bugs" == field:
                 repr += imap(lambda x: "bug-%s: %s" % x, value.iteritems())
-        return "\n".join(repr)
+        return "\n".join(repr) + "\n"
 
     @classmethod
     def parse(cls, lines):
@@ -93,7 +126,7 @@ class Header(object):
             if match:
                 key = match.group("key").lower()
                 continuation_field = key if key in cls.CONTINUATION_FIELDS else None
-                cls._parse_patch_handle_match(header, key, match.group("data") or "")
+                header._setdata(key, match.group("data") or "")
 
             # add continuation lines if the last parsed field was a continuation field
             elif continuation_field and " " == line[0]:
@@ -105,19 +138,11 @@ class Header(object):
 
         return header
 
-    @classmethod
-    def _parse_patch_handle_match(cls, header, key, data):
-        """Adds the data for key to the Dep3PatchHeader instance.
+# iterator returning only the first item for which pred evaluates to true
+_filterfirst = lambda pred, it: islice(dropwhile(lambda x: not pred(x), it), 1)
 
-        key must be lowercase
-        """
-
-        if key in cls.SINGLE_FIELDS_LIST:
-            header.set(key, data)
-        elif key in cls.MULTI_FIELDS_LIST:
-            header.get(key).append(data)
-        elif key.startswith("bug-"):
-            header.get("vendor-bugs")[key[4:]] = data
-        else:
-            raise "should not happen: " + key
-
+def _replace_first_in_list(targetlist, searched, replacement):
+    found = next(_filterfirst(lambda x: x[1]==searched, itertools.izip(itertools.count(), targetlist)), None)
+    if found:
+        targetlist[found[0]] = replacement
+    return bool(found)
