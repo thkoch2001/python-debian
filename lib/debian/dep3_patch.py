@@ -9,8 +9,22 @@ class Header(object):
 
     """Fields of a dep3 patch header.
 
-    Fields containing a hyphen are translated to attributes with underscore, e.g.
-    last_update instead of last-update.
+    This class does not intend to retain a patch header verbatim. It would be
+    a huge effort to do so with little benefit. After a parse-format cycle the
+    following will have changed:
+
+    - Fields have a fixed order regardless of the original order.
+    - The description field is always formatted as continuation field
+      with one space indentation. It does parse but not generate unindented
+      description lines.
+    - Field names are formatted in lowercase regardless of the original case.
+
+    The module does not support dpatch, only quilt.  The module does not use
+    the deb822 module of python-debian because it is rather hard to
+    understand, provides more than needed and might fail to parse unindented
+    description lines.
+
+    see: http://dep.debian.net/deps/dep3 for the DEP3 specification
     """
 
     # taken from quilt/scripts/patchfns.in
